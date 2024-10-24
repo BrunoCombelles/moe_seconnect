@@ -6,8 +6,14 @@ SELECT
     term_code, 
     s.statement_id, 
     s.registration, 
-    rank() over (partition by term_code, s.activity_id, s.persona_id order by s."timestamp" desc) latest_in_term,
-    rank() over (partition by s.activity_id, s.persona_id order by s."timestamp" desc) latest_all_times,
+    rank() over (partition by term_code, 
+        --s.activity_id, 
+        c.competency_title,
+        s.persona_id order by s."timestamp" desc) latest_in_term,
+    rank() over (partition by 
+        --s.activity_id,
+        c.competency_title,
+        s.persona_id order by s."timestamp" desc) latest_all_times,
     lead(s."timestamp") over (partition by s.activity_id, s.persona_id order by s."timestamp" desc) previous_response_date
 FROM ${warehouse_schema}.seconnect_terms t
 JOIN ${warehouse_schema}.xapi_statements s
