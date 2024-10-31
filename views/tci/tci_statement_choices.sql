@@ -1,7 +1,9 @@
 
 DROP MATERIALIZED VIEW IF EXISTS  ${warehouse_schema}.tci_statement_choices;
 
-CREATE MATERIALIZED VIEW ${warehouse_schema}.tci_statement_choices AS
+DROP MATERIALIZED VIEW IF EXISTS  seconnect_dev_warehouse.tci_statement_choices;
+
+CREATE MATERIALIZED VIEW seconnect_dev_warehouse.tci_statement_choices AS
 SELECT 
     sc.statement_id, 
     sc.component_id,
@@ -21,7 +23,7 @@ SELECT
         -- Term 2 - Q10
         sc.activity_id='https://api.learning.moe.edu.sg/activity/547a3c35-0674-4792-8aeb-c3700d9b5f4c/question/0d1c5168-5320-4199-a991-7d3e743bca26'
         and sc.component_id<>'10000000849929'
-        and  rs_coping_score.statement_id is not null THEN False
+        and  rs_coping_noone_score.statement_id is not null THEN False
     WHEN
         -- Term 3 - Q6
         sc.activity_id='https://api.learning.moe.edu.sg/activity/7c2940e1-878f-40d8-9088-084e816154cd/question/f3a9c672-4e5e-46b3-9a16-8751812d5506'
@@ -45,28 +47,29 @@ SELECT
     ELSE
         True
     END valid_response
-FROM ${warehouse_schema}.xapi_statement_choices sc
+FROM seconnect_dev_warehouse.xapi_statement_choices sc
 LEFT JOIN
     (SELECT statement_id
-    FROM ${warehouse_schema}.tci_response_scores
+    FROM seconnect_dev_warehouse.tci_response_scores
     WHERE indicator='worries_score'
     AND score>0) rs_worries_score
 ON sc.statement_id=rs_worries_score.statement_id
 LEFT JOIN
-    (SELECT statement_id
-    FROM ${warehouse_schema}.tci_response_scores
-    WHERE indicator='coping_strat_score'
-    AND score>0) rs_coping_score
-ON sc.statement_id=rs_coping_score.statement_id
+    (
+        SELECT statement_id
+    FROM seconnect_dev_warehouse.tci_response_scores
+    WHERE indicator='coping_noone_score'
+    AND score>0) rs_coping_noone_score
+ON sc.statement_id=rs_coping_noone_score.statement_id
 LEFT JOIN
     (SELECT statement_id
-    FROM ${warehouse_schema}.tci_response_scores
+    FROM seconnect_dev_warehouse.tci_response_scores
     WHERE indicator='stress_score'
     AND score>0) rs_stress_score
 ON sc.statement_id=rs_stress_score.statement_id
 LEFT JOIN
     (SELECT statement_id
-    FROM ${warehouse_schema}.tci_response_scores
+    FROM seconnect_dev_warehouse.tci_response_scores
     WHERE indicator='challenge_score'
     AND score>0) rs_challenge_score
 ON sc.statement_id=rs_challenge_score.statement_id;
